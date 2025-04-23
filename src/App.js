@@ -1,24 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './presentation/contexts/AuthContext';
+import ProtectedRoute from './presentation/components/auth/ProtectedRoute';
+import HomePage from './presentation/pages/Home/HomePage';
+import LoginPage from './presentation/pages/Login/LoginPage';
+import RegisterPage from './presentation/pages/Register/RegisterPage';
+import ProfilePage from './presentation/pages/Profile/ProfilePage';
+import EasyParkingPage from './presentation/pages/EasyParking/EasyParkingPage';
+import MobileFriendlyPage from './presentation/pages/MobileFriendly/MobileFriendlyPage';
+import SmartPricingPage from './presentation/pages/SmartPricing/SmartPricingPage';
+import './presentation/styles/main.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/easy-parking" element={<EasyParkingPage />} />
+          <Route path="/mobile-friendly" element={<MobileFriendlyPage />} />
+          <Route path="/smart-pricing" element={<SmartPricingPage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
