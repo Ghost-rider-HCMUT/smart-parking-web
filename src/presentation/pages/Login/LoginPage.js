@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import '../../../presentation/styles/main.css';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
@@ -13,10 +13,10 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      await login(username, password);
       navigate('/profile');
     } catch (error) {
-      setError('Invalid email or password');
+      setError('Invalid username or password');
     }
   };
 
@@ -27,12 +27,12 @@ const LoginPage = () => {
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={handleLogin}>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label">Username</label>
             <input
-              type="email"
+              type="text"
               className="form-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>

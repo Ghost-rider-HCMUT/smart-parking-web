@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../../presentation/styles/main.css';
 
 const HomePage = () => {
-  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
 
   return (
@@ -17,12 +23,21 @@ const HomePage = () => {
         <div className="header-content">
           <div className="logo-section">
             <h1>Smart Parking</h1>
+            <p className="welcome-text">Welcome to Smart Parking System</p>
           </div>
           <nav className="nav">
-            {!isAuthenticated && (
+            {isAuthenticated ? (
+              <button onClick={handleLogout} className="btn btn-secondary">
+                Logout
+              </button>
+            ) : (
               <>
-                <Link to="/login" className="btn btn-secondary">Login</Link>
-                <Link to="/register" className="btn btn-primary">Register</Link>
+                <button onClick={() => navigate('/login')} className="btn btn-primary">
+                  Login
+                </button>
+                <button onClick={() => navigate('/register')} className="btn btn-secondary">
+                  Register
+                </button>
               </>
             )}
           </nav>
@@ -33,10 +48,18 @@ const HomePage = () => {
               <span></span>
             </div>
             <div className={`mobile-nav ${isMenuOpen ? 'active' : ''}`}>
-              {!isAuthenticated && (
+              {isAuthenticated ? (
+                <button onClick={handleLogout} className="btn btn-secondary">
+                  Logout
+                </button>
+              ) : (
                 <>
-                  <Link to="/login" className="btn btn-secondary">Login</Link>
-                  <Link to="/register" className="btn btn-primary">Register</Link>
+                  <button onClick={() => navigate('/login')} className="btn btn-primary">
+                    Login
+                  </button>
+                  <button onClick={() => navigate('/register')} className="btn btn-secondary">
+                    Register
+                  </button>
                 </>
               )}
             </div>

@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import RegisterUseCase from '../../../core/application/use-cases/auth/RegisterUseCase';
-import UserRepositoryImpl from '../../../core/infrastructure/repositories/UserRepositoryImpl';
+import API_CONFIG from '../../../core/infrastructure/config/api.config';
 import '../../../presentation/styles/main.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    fullName: '',
     username: '',
-    email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phoneNumber: '',
+    rentalLocation: null,
+    months: null,
+    licensePlateNumber: null
   });
   const [error, setError] = useState('');
 
@@ -31,16 +34,23 @@ const RegisterPage = () => {
     }
 
     try {
-      const userRepository = new UserRepositoryImpl();
-      const registerUseCase = new RegisterUseCase(userRepository);
-      await registerUseCase.execute(
-        formData.username,
-        formData.email,
-        formData.password
-      );
-      navigate('/login');
+      const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.REGISTER}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.code === 1000) {
+        navigate('/login');
+      } else {
+        setError(data.message || 'Registration failed');
+      }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Registration failed');
     }
   };
 
@@ -50,6 +60,18 @@ const RegisterPage = () => {
         <h2>Register</h2>
         {error && <div className="alert alert-error">{error}</div>}
         <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Full Name</label>
+            <input
+              type="text"
+              name="fullName"
+              className="form-input"
+              placeholder="Enter your full name"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+            />
+          </div>
           <div className="form-group">
             <label className="form-label">Username</label>
             <input
@@ -63,13 +85,13 @@ const RegisterPage = () => {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label">Phone Number</label>
             <input
-              type="email"
-              name="email"
+              type="tel"
+              name="phoneNumber"
               className="form-input"
-              placeholder="Enter your email"
-              value={formData.email}
+              placeholder="Enter your phone number"
+              value={formData.phoneNumber}
               onChange={handleChange}
               required
             />
