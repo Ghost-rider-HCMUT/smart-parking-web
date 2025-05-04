@@ -1,5 +1,5 @@
 const API_CONFIG = {
-  BASE_URL: 'http://localhost:8080/smart-parking',
+  BASE_URL: 'https://a347-2405-4800-5715-b120-947f-1c8-f882-39b4.ngrok-free.app/smart-parking',
   ENDPOINTS: {
     LOGIN: '/auth/token',
     REGISTER: '/users',
