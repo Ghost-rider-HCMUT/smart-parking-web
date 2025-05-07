@@ -5,7 +5,7 @@ import API_CONFIG from '../../../core/infrastructure/config/api.config';
 import '../../../presentation/styles/main.css';
 
 const ProfilePage = () => {
-  const { token, logout } = useAuth();
+  const { token, logout, refreshToken } = useAuth();
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -13,12 +13,14 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       try {
+        // Try to refresh token first
+        const isTokenValid = await refreshToken();
+        if (!isTokenValid) {
+          navigate('/login');
+          return;
+        }
+
         const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PROFILE}`, {
           method: 'POST',
           headers: {
@@ -42,7 +44,7 @@ const ProfilePage = () => {
     };
 
     fetchProfileData();
-  }, [token, navigate]);
+  }, [token, navigate, refreshToken]);
 
   const handleLogout = async () => {
     await logout();
@@ -56,6 +58,22 @@ const ProfilePage = () => {
   if (error) {
     return <div className="error">{error}</div>;
   }
+
+  function formatDateTime(input) {
+    const date = new Date(input);
+    const pad = n => String(n).padStart(2, '0');
+  
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1); // tháng bắt đầu từ 0
+    const year = date.getFullYear();
+  
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+  
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  }
+  
 
   return (
     <div className="profile-container">
@@ -93,10 +111,8 @@ const ProfilePage = () => {
               <span>{profileData?.phoneNumber || 'N/A'}</span>
             </div>
             <div className="info-item">
-              <label>Status:</label>
-              <span className={`status ${profileData?.status?.toLowerCase() || 'not-active'}`}>
-                {profileData?.status || 'N/A'}
-              </span>
+              <label>Start Time:</label>
+              <span>{formatDateTime(profileData?.startTime)}</span>
             </div>
           </div>
         </div>
@@ -107,7 +123,7 @@ const ProfilePage = () => {
             <div className="info-grid">
               <div className="info-item">
                 <label>Rental Location:</label>
-                <span>{profileData?.rentalLocation || 'N/A'}</span>
+                <span>{profileData?.rentalLocation?.id || 'N/A'}</span>
               </div>
               <div className="info-item">
                 <label>License Plate Number:</label>
@@ -119,7 +135,7 @@ const ProfilePage = () => {
               </div>
               <div className="info-item">
                 <label>Start Time:</label>
-                <span>{profileData?.startTime || 'N/A'}</span>
+                <span>{formatDateTime(profileData?.startTime) || 'N/A'}</span>
               </div>
             </div>
 
